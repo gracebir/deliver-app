@@ -22,7 +22,7 @@ const Button: React.FC<buttonProps> = ({
             type={type}
         >
             {isLoading ? (
-                <span className='loading loading-spinner loading-lg'></span>
+                <span className='loading loading-spinner loading-md'></span>
             ) : (
                 text
             )}

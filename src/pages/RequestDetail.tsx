@@ -1,7 +1,7 @@
 /** @format */
 
 import React, { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { TiWarning } from "react-icons/ti";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -9,19 +9,27 @@ import "leaflet/dist/leaflet.css";
 import {
     setNotification,
     useGetRequestDetailQuery,
+    useUpdateStatusMutation,
 } from "../states/slices/requestSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../states/store";
 import Button from "../components/Button";
 import { useGetUserByidQuery } from "../states/slices/authSlice";
+import { toast } from "react-toastify";
+import { useSocketContext } from "../states/socketContext";
 
 const RequestDetail: React.FC = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const { data, isLoading } = useGetRequestDetailQuery(id);
+    const [updateStatus, { isError, isLoading: isLoadingStatus }] =
+        useUpdateStatusMutation();
     const dispatch: AppDispatch = useDispatch();
     const notification = useSelector(
         (state: RootState) => state.request.notification
     );
+
+    const { socket } = useSocketContext();
 
     const { data: user } = useGetUserByidQuery(notification?.senderId);
 
@@ -30,6 +38,44 @@ const RequestDetail: React.FC = () => {
             dispatch(setNotification(data));
         }
     }, [data, isLoading]);
+
+    const handleUpdate = async () => {
+        const value = {
+            status: "accepted",
+        };
+        try {
+            const response = await updateStatus({
+                id,
+                value,
+            }).unwrap();
+            if (response) {
+                if (!isLoadingStatus) {
+                    toast.success("Notificaiton envoyer");
+                }
+            }
+        } catch (error) {
+            if (isError) {
+                toast.error("Erreur");
+            }
+        }
+    };
+
+    useEffect(() => {
+        // Check if the socket is available before setting up the listener
+        if (socket) {
+            socket.on("changeStatus", (changeStatus: RequestType) => {
+                dispatch(setNotification(changeStatus));
+            });
+
+            // Cleanup function to remove the listener
+            return () => {
+                socket.off("changeStatus");
+            };
+        }
+
+        // If there's no socket, return undefined (or just return nothing)
+        return undefined;
+    }, [socket, dispatch]);
 
     console.log(data);
     if (isLoading)
@@ -81,7 +127,21 @@ const RequestDetail: React.FC = () => {
                     </h1>
                 </div>
                 <div>
-                    <Button text='En route' type='button' />
+                    {notification?.status === "completed" ? (
+                        <Button
+                            handleClick={() => navigate("/")}
+                            isLoading={isLoadingStatus}
+                            text='Quitter'
+                            type='button'
+                        />
+                    ) : (
+                        <Button
+                            handleClick={() => handleUpdate()}
+                            isLoading={isLoadingStatus}
+                            text='En route'
+                            type='button'
+                        />
+                    )}
                 </div>
             </div>
         </div>

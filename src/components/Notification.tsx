@@ -2,16 +2,20 @@
 
 import React, { useEffect } from "react";
 import {
+    addNotification,
     setNotifications,
     useGetRequestQuery,
 } from "../states/slices/requestSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../states/store";
 import Card from "./Card";
+import { useSocketContext } from "../states/socketContext";
+import notification from "../assets/notification.mp3";
 
 const Notification: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);
     const { data, isLoading } = useGetRequestQuery(user?._id);
+    const { socket } = useSocketContext();
     const dispatch: AppDispatch = useDispatch();
     const notifications = useSelector(
         (state: RootState) => state.request.notifications
@@ -22,6 +26,25 @@ const Notification: React.FC = () => {
             dispatch(setNotifications(data));
         }
     }, [isLoading, data]);
+
+    useEffect(() => {
+        // Check if the socket is available before setting up the listener
+        if (socket) {
+            socket.on("newRequest", (newRequest: RequestType) => {
+                const sound = new Audio(notification);
+                sound.play();
+                dispatch(addNotification(newRequest));
+            });
+
+            // Cleanup function to remove the listener
+            return () => {
+                socket.off("newRequest");
+            };
+        }
+
+        // If there's no socket, return undefined (or just return nothing)
+        return undefined;
+    }, [socket, dispatch]);
 
     if (isLoading)
         return (

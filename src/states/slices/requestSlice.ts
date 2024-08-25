@@ -40,13 +40,17 @@ const requestSlice = createSlice({
         setNotifications: (state, { payload }) => {
             state.notifications = payload;
         },
+        addNotification: (state, { payload }) => {
+            state.notifications?.push(payload);
+        },
         setNotification: (state, { payload }) => {
             state.notification = payload;
         },
     },
 });
 
-export const { setNotification, setNotifications } = requestSlice.actions;
+export const { setNotification, setNotifications, addNotification } =
+    requestSlice.actions;
 
 export const {
     useGetRequestQuery,
