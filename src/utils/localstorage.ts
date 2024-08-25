@@ -12,7 +12,7 @@ export const removeTokenFromLocalStorage = () => {
 
 export const getInitialToken = () => {
     if (typeof window !== "undefined") {
-        return localStorage.getItem("auth-admin-token");
+        return localStorage.getItem("auth-socket-token");
     }
     return null;
 };
