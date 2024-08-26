@@ -54,7 +54,7 @@ const Notification: React.FC = () => {
         );
 
     return (
-        <div className='h-[80vh] w-full px-6 py-2 border-2 border-gray-500 overflow-y-auto'>
+        <div className='h-[80vh] w-full flex flex-col gap-2 px-6 py-2 border-2 border-gray-500 overflow-y-auto'>
             {notifications?.length !== 0 ? (
                 notifications?.map((notification) => (
                     <Card
