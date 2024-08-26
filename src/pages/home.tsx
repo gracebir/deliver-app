@@ -12,6 +12,7 @@ const Home: React.FC = () => {
     const { data, isLoading } = useGetMeQuery({});
     const dispatch: AppDispatch = useDispatch();
     const user = useSelector((state: RootState) => state.auth.user);
+    const notifications = useSelector((state: RootState) => state.request.notifications);
 
     useEffect(() => {
         if (!isLoading && data?.user) {
@@ -30,7 +31,7 @@ const Home: React.FC = () => {
                 <div className='h-10 w-10 bg-white rounded-md relative flex items-center justify-center shadow-md'>
                     <CiBellOn size={25} />
                     <span className='fixed top-2 right-5 z-20 bg-gray-800 text-white text-[9px] p-1 rounded-full'>
-                        20
+                        {notifications?.length}
                     </span>
                 </div>
             </div>
