@@ -41,7 +41,7 @@ const RequestDetail: React.FC = () => {
 
     const handleUpdate = async () => {
         const value = {
-            status: "accepted",
+            status: "on_way",
         };
         try {
             const response = await updateStatus({
