@@ -30,7 +30,7 @@ const Home: React.FC = () => {
                 </div>
                 <div className='h-10 w-10 bg-white rounded-md relative flex items-center justify-center shadow-md'>
                     <CiBellOn size={25} />
-                    <span className='fixed top-2 right-5 z-20 bg-gray-800 text-white text-[9px] p-1 rounded-full'>
+                    <span className='fixed top-2 right-5 z-20 bg-gray-800 text-white text-[9px] p-1 w-5 h-5 text-center rounded-full'>
                         {notifications?.length}
                     </span>
                 </div>
